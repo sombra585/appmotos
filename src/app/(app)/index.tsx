@@ -1,4 +1,5 @@
 import {
+  Alert,
   View,
   Text,
   StyleSheet,
@@ -6,10 +7,34 @@ import {
   Pressable,
   Image,
 } from 'react-native';
+import { useState } from 'react';
 
 import { router } from 'expo-router';
+import { supabase } from '../../lib/supabase';
 
 export default function Inicio() {
+  const [cerrandoSesion, setCerrandoSesion] = useState(false);
+
+  const cerrarSesion = async () => {
+    try {
+      setCerrandoSesion(true);
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        Alert.alert('No se pudo cerrar sesión', error.message);
+      }
+    } catch (error: unknown) {
+      Alert.alert(
+        'Error al cerrar sesión',
+        error instanceof Error
+          ? error.message
+          : 'Ocurrió un error inesperado. Inténtalo de nuevo.'
+      );
+    } finally {
+      setCerrandoSesion(false);
+    }
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -147,6 +172,16 @@ export default function Inicio() {
           </Text>
         </Pressable>
       </View>
+
+      <Pressable
+        style={[styles.botonCerrar, cerrandoSesion && styles.botonDeshabilitado]}
+        onPress={() => void cerrarSesion()}
+        disabled={cerrandoSesion}
+      >
+        <Text style={styles.textoCerrar}>
+          {cerrandoSesion ? 'Cerrando sesión...' : 'Cerrar sesión'}
+        </Text>
+      </Pressable>
 
     </ScrollView>
   );
@@ -321,5 +356,22 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     lineHeight: 22,
     marginBottom: 18,
+  },
+
+  botonCerrar: {
+    backgroundColor: '#8E3B46',
+    padding: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+
+  botonDeshabilitado: {
+    opacity: 0.7,
+  },
+
+  textoCerrar: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
 });

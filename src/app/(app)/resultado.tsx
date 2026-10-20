@@ -24,7 +24,10 @@ export default function Resultado() {
         <Text style={styles.valor}>{ciudad}</Text>
       </View>
 
-      <Pressable style={styles.boton} onPress={() => router.replace("/")}>
+      <Pressable
+        style={styles.boton}
+        onPress={() => router.replace("/(app)/index")}
+      >
         <Text style={styles.botonTexto}>Volver al inicio</Text>
       </Pressable>
     </View>

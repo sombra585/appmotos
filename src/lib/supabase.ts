@@ -1,5 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
 import "react-native-url-polyfill/auto";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
+
+const webStorage = {
+  getItem: async (key: string) =>
+    typeof window === "undefined" ? null : window.localStorage.getItem(key),
+  setItem: async (key: string, value: string) => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(key, value);
+    }
+  },
+  removeItem: async (key: string) => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(key);
+    }
+  },
+};
 
 const supabaseUrl = "https://agddfqzpxhntmzmjhjkt.supabase.co";
 const supabaseAnonKey =
@@ -7,8 +24,9 @@ const supabaseAnonKey =
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false,
-    autoRefreshToken: false,
+    storage: Platform.OS === "web" ? webStorage : AsyncStorage,
+    persistSession: true,
+    autoRefreshToken: true,
     detectSessionInUrl: false,
   },
 });
